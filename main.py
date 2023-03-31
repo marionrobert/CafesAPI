@@ -71,14 +71,6 @@ def get_all():
     return jsonify(cafes=all_cafes)
 
 
-# @app.route("/search?loc=<loc>")
-# def search_at_location(loc):
-#     cafe_at_location = db.session.execute(db.select(Cafe).filter_by(location=loc)).first()
-#     if cafe_at_location:
-#         return jsonify(cafe=cafe_at_location.to_dict())
-#     else:
-#         return jsonify(error={"Not Found": {"Sorry, we don't have a cafe at that location."}})
-
 @app.route("/search")
 def get_cafes_at_location():
     query_location = request.args.get("loc")
@@ -88,6 +80,24 @@ def get_cafes_at_location():
     else:
         return jsonify(error={"Not Found": "Sorry, we don't have a cafe at that location."})
 
+
+@app.route("/add", methods=["POST"])
+def post_new_cafe():
+    new_cafe = Cafe(
+        name=request.form.get("name"),
+        map_url=request.form.get("map_url"),
+        img_url=request.form.get("img_url"),
+        location=request.form.get("loc"),
+        has_sockets=bool(request.form.get("sockets")),
+        has_toilet=bool(request.form.get("toilet")),
+        has_wifi=bool(request.form.get("wifi")),
+        can_take_calls=bool(request.form.get("calls")),
+        seats=request.form.get("seats"),
+        coffee_price=request.form.get("coffee_price"),
+    )
+    db.session.add(new_cafe)
+    db.session.commit()
+    return jsonify(response={"success": "Successfully added the new cafe."})
 
 
 ## HTTP GET - Read Record
