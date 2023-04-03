@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 import random
+import os
 
 app = Flask(__name__)
 
@@ -8,6 +9,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+TopSecretAPIKey = os.environ["TopSecretAPIKey"]
+# fmBye^cfbP2g82¨mf$
 
 
 ##Cafe TABLE Configuration
@@ -112,6 +115,22 @@ def patch_new_price(cafe_id):
     else:
         # 404 = Resource not found
         return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."}), 404
+
+
+@app.route('/report-closed/<int:cafe_id>', methods=["DElETE"])
+def delete_a_cafe(cafe_id):
+    api_key = request.args.get("api-key")
+    cafe = db.session.query(Cafe).get(cafe_id)
+    if api_key == os.environ["TopSecretAPIKey"]:
+        if cafe:
+            db.session.delete(cafe)
+            db.session.commit()
+            return jsonify(response={"success": "Successfully deleted the cafe."}), 200
+        else:
+            return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."}), 404
+    else:
+        return jsonify(error={"Sorry, that's not allowed. Make sure you have the correct apy_key"}), 403
+    pass
 
 
 if __name__ == '__main__':
