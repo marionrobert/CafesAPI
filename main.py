@@ -112,7 +112,7 @@ def post_new_cafe():
             db.session.commit()
             return jsonify(response={"success": "Successfully added the new cafe."}), 200
     else:
-        return jsonify(error={"Sorry, that's not allowed. Make sure you have the correct apy_key"}), 403
+        return jsonify(error={"Forbidden": "Sorry, that's not allowed. Make sure you have the correct api_key."}), 403
 
 
 @app.route("/update-price/<int:cafe_id>", methods=["PATCH"])
