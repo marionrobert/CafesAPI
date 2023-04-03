@@ -98,9 +98,21 @@ def post_new_cafe():
         seats=request.form.get("seats"),
         coffee_price=request.form.get("coffee_price"),
     )
-    db.session.add(new_cafe)
-    db.session.commit()
-    return jsonify(response={"success": "Successfully added the new cafe."})
+    api_key = request.args.get("api-key")
+    if api_key == os.environ["TopSecretAPIKey"]:
+        # Check if cafe with the same name already exists
+        search_cafe = db.session.query(Cafe).filter_by(
+            name=new_cafe.name,
+            location=new_cafe.location
+        ).all()
+        if search_cafe:
+            return jsonify(error={"exists": "Cafe with this name already exists."}), 400
+        else:
+            db.session.add(new_cafe)
+            db.session.commit()
+            return jsonify(response={"success": "Successfully added the new cafe."}), 200
+    else:
+        return jsonify(error={"Sorry, that's not allowed. Make sure you have the correct apy_key"}), 403
 
 
 @app.route("/update-price/<int:cafe_id>", methods=["PATCH"])
@@ -110,10 +122,8 @@ def patch_new_price(cafe_id):
     if cafe:
         cafe.coffee_price = new_price
         db.session.commit()
-        ## Just add the code after the jsonify method. 200 = Ok
         return jsonify(response={"success": "Successfully updated the price."}), 200
     else:
-        # 404 = Resource not found
         return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."}), 404
 
 
@@ -122,15 +132,15 @@ def delete_a_cafe(cafe_id):
     api_key = request.args.get("api-key")
     cafe = db.session.query(Cafe).get(cafe_id)
     if api_key == os.environ["TopSecretAPIKey"]:
+        cafe = db.session.query(Cafe).get(cafe_id)
         if cafe:
             db.session.delete(cafe)
             db.session.commit()
-            return jsonify(response={"success": "Successfully deleted the cafe."}), 200
+            return jsonify(response={"success": "Successfully deleted the cafe from the database."}), 200
         else:
             return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."}), 404
     else:
-        return jsonify(error={"Sorry, that's not allowed. Make sure you have the correct apy_key"}), 403
-    pass
+        return jsonify(error={"Forbidden": "Sorry, that's not allowed. Make sure you have the correct api_key."}), 403
 
 
 if __name__ == '__main__':
