@@ -107,9 +107,11 @@ def patch_new_price(cafe_id):
     if cafe:
         cafe.coffee_price = new_price
         db.session.commit()
-        return jsonify(response={"success": "Successfully updated the price."})
+        ## Just add the code after the jsonify method. 200 = Ok
+        return jsonify(response={"success": "Successfully updated the price."}), 200
     else:
-        return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."})
+        # 404 = Resource not found
+        return jsonify(error={"Not Found": "Sorry a cafe with that id was not found in the database."}), 404
 
 
 if __name__ == '__main__':
