@@ -10,8 +10,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 TopSecretAPIKey = os.environ["TopSecretAPIKey"]
-# fmBye^cfbP2g82¨mf$
-
 
 ##Cafe TABLE Configuration
 class Cafe(db.Model):
